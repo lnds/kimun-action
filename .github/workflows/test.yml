@@ -1,0 +1,39 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  action:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: lnds/kimun
+          path: sample
+      - id: km
+        uses: ./
+        with:
+          path: sample
+      - name: Check outputs and badges
+        shell: bash
+        env:
+          SCORE: ${{ steps.km.outputs.score }}
+          GRADE: ${{ steps.km.outputs.grade }}
+          DIR: ${{ steps.km.outputs.badge-dir }}
+        run: |
+          echo "score=$SCORE grade=$GRADE dir=$DIR"
+          [[ "$SCORE" =~ ^[0-9]+\.[0-9]$ ]]
+          [[ "$GRADE" =~ ^[A-DF][+-]{0,2}$ ]]
+          grep -q '^<svg' "$DIR/km-score.svg"
+          grep -q '"schemaVersion": 1' "$DIR/km-score.json"

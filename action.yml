@@ -1,0 +1,44 @@
+name: Kimün score
+description: Grade the code health of a project with km (A++ to F--) and write a badge of the score
+author: Eduardo Díaz
+branding:
+  icon: activity
+  color: green
+
+inputs:
+  version:
+    description: Version of kimun to install, such as 0.44.0, or latest
+    default: latest
+  path:
+    description: Directory to analyze
+    default: .
+  badge-dir:
+    description: Directory where km-score.svg and km-score.json are written
+    default: km-badge
+
+outputs:
+  score:
+    description: The score, 0 to 100, with one decimal
+    value: ${{ steps.score.outputs.score }}
+  grade:
+    description: The grade, A++ to F--
+    value: ${{ steps.score.outputs.grade }}
+  badge-dir:
+    description: Directory holding km-score.svg and km-score.json
+    value: ${{ steps.score.outputs.badge-dir }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install kimun
+      shell: bash
+      env:
+        KM_VERSION: ${{ inputs.version }}
+      run: '"$GITHUB_ACTION_PATH/install.sh"'
+    - name: Score and badge
+      id: score
+      shell: bash
+      env:
+        KM_PATH: ${{ inputs.path }}
+        KM_BADGE_DIR: ${{ inputs.badge-dir }}
+      run: '"$GITHUB_ACTION_PATH/score.sh"'
