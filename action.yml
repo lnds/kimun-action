@@ -18,10 +18,10 @@ inputs:
 
 outputs:
   score:
-    description: The score, 0 to 100, with one decimal
+    description: The score, 0 to 100, with one decimal, or - when there is nothing to grade
     value: ${{ steps.score.outputs.score }}
   grade:
-    description: The grade, A++ to F--
+    description: The grade, A++ to F--, or - when there is nothing to grade
     value: ${{ steps.score.outputs.grade }}
   badge-dir:
     description: Directory holding km-score.svg and km-score.json

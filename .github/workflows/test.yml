@@ -37,3 +37,14 @@ jobs:
           [[ "$GRADE" =~ ^[A-DF][+-]{0,2}$ ]]
           grep -q '^<svg' "$DIR/km-score.svg"
           grep -q '"schemaVersion": 1' "$DIR/km-score.json"
+      # A km that prints what a project with nothing to grade gets.
+      - name: Nothing to grade
+        shell: bash
+        run: |
+          mkdir stub
+          printf '%s\n' '#!/usr/bin/env bash' 'echo "score s:- g:- files:0 loc:0 cognitive:- duplication:- indentation:- halstead:- file:-"' > stub/km
+          chmod +x stub/km
+          PATH="$PWD/stub:$PATH" KM_PATH=. KM_BADGE_DIR=stub/badge GITHUB_OUTPUT=stub/output GITHUB_STEP_SUMMARY=stub/summary ./score.sh
+          grep -qx 'score=-' stub/output
+          grep -qx 'grade=-' stub/output
+          grep -qx '### km score: nothing to grade' stub/summary

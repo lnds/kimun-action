@@ -8,13 +8,17 @@ mkdir -p "$KM_BADGE_DIR"
 summary=$(km score "$KM_PATH" --format short --badge "$KM_BADGE_DIR/km-score.svg")
 km score "$KM_PATH" --format terse --badge "$KM_BADGE_DIR/km-score.json" >/dev/null
 
-# The short format reads "score s:91.4 g:A files:..."
-score=$(sed -E 's/.* s:([0-9.]+) .*/\1/' <<<"$summary")
+# The short format reads "score s:91.4 g:A files:...", or "score s:- g:- ..."
+# when the project has nothing to grade: no code files.
+score=$(sed -E 's/.* s:([0-9.]+|-) .*/\1/' <<<"$summary")
 grade=$(sed -E 's/.* g:([^ ]+) .*/\1/' <<<"$summary")
 {
   echo "score=$score"
   echo "grade=$grade"
   echo "badge-dir=$KM_BADGE_DIR"
 } >> "$GITHUB_OUTPUT"
-echo "### km score: $grade ($score)" >> "$GITHUB_STEP_SUMMARY"
+case "$grade" in
+  -) echo "### km score: nothing to grade" ;;
+  *) echo "### km score: $grade ($score)" ;;
+esac >> "$GITHUB_STEP_SUMMARY"
 echo "$summary"

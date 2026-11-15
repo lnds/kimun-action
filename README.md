@@ -73,9 +73,11 @@ This workflow publishes the badge as the whole Pages site. If the repository alr
 
 | Output | Example | Description |
 |--------|---------|-------------|
-| `score` | `91.4` | The score, 0 to 100 |
-| `grade` | `A` | The grade, A++ to F-- |
+| `score` | `91.4` | The score, 0 to 100, or `-` when there is nothing to grade |
+| `grade` | `A` | The grade, A++ to F--, or `-` when there is nothing to grade |
 | `badge-dir` | `km-badge` | Directory holding the badges |
+
+A project with nothing to grade, no code files, has no score: both outputs are `-` and the badge says `not graded`. In an expression `-` is not a number, so both `steps.km.outputs.score < 80` and `>= 80` are false for it; `steps.km.outputs.grade == '-'` tells it apart.
 
 ## More than the badge
 
